@@ -1,0 +1,133 @@
+import express from 'express';
+
+import bodyParser from 'body-parser';
+import mysql from 'mysql2';
+import cors from 'cors';
+
+const app = express();
+const port = 8000;
+
+app.use(cors());
+app.use(bodyParser.json());
+
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
+
+app.get("/", (req, res) => {
+    res.send("Bienvenidos a mi api");
+});
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '1234',
+    port: 3306,
+    database: 'doctor_paciente'
+});
+
+db.connect((error) => {
+    if (error) {
+        console.log("Error al conectar a la base de datos");
+        return
+    } else {
+        console.log("Conexion Exitosa");
+    }
+});
+//consultar la tabla doctor
+app.get('/doctor/', (req, res) => {
+    const query = "SELECT * FROM doctor";
+    db.query(query, (error, results) => {
+        if (error) {
+            res.status(500).send('Error al ejecutar la consulta');
+            return;
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+//consultar la tabla paciente
+app.get('/paciente/', (req, res) => {
+    const query = "SELECT * FROM paciente";
+    db.query(query, (error, results) => {
+        if (error) {
+            res.status(500).send('Error al ejecutar la consulta');
+            return;
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+//consultar la tabla doctor_paciente
+app.get('/doctor_paciente/', (req, res) => {
+    const query = "SELECT * FROM doctor_paciente";
+    db.query(query, (error, results) => {
+        if (error) {
+            res.status(500).send('Error al ejecutar la consulta');
+            return;
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
+// ---------------------------------------------------------------------------------------
+// modificar el insertar datos en la tabla doctor
+//----------------------------------------------------------------------------------------
+app.post('/doctor/', (req, res) => {
+    const { id_doctor, nombre, apellido, especialidad, cedula, telefono, correo, horario } = req.body;
+    const query = 'INSERT INTO doctor (id_doctor,nombre,apellido,especialidad,cedula,telefono,correo,horario) VALUES(?,?,?,?,?,?,?,?)';
+    db.query(query,
+        [id_doctor, nombre, apellido, especialidad, cedula, telefono, correo, horario],
+        (error, results) => {
+            if (error) {
+                res.status(500).send('Error al ejecutar la consulta');
+                return;
+            } else {
+                res.status(201).json({ message: 'Doctor registrado exitosamente', results });
+            }
+        }
+    );
+});
+
+// ---------------------------------------------------------------------------------------
+// modificar el delete de datos en la tabla doctor
+//----------------------------------------------------------------------------------------
+app.delete('/doctor/:id_doctor', (req, res) => {
+    const { id_doctor } = req.params;
+    const query = 'DELETE FROM doctor WHERE id_doctor=?';
+    db.query(query, [id_doctor], (error, results) => {
+        if (error) {
+            res.status(500).send('Error al eliminar el doctor');
+            return;
+        }
+        if (results.affectedRows === 0) {
+            res.status(404).send('No existe el doctor');
+            return;
+        }
+        res.status(200).json({ message: 'Doctor eliminado exitosamente' });
+    });
+});
+
+// ---------------------------------------------------------------------------------------
+// modificar el editar de datos en la tabla doctor
+//----------------------------------------------------------------------------------------
+
+app.put('/doctor/:id_doctor', (req, res) => {
+    const { id_doctor } = req.params;
+    const { nombre, apellido, especialidad, cedula, telefono, correo, horario } = req.body;
+    const query = 'UPDATE doctor set nombre=?, apellido=?, especialidad=?, cedula=?, telefono=?, correo=?, horario=? WHERE id_doctor=?';
+    db.query(query,
+        [nombre, apellido, especialidad, cedula, telefono, correo, horario, id_doctor],
+        (error, results) => {
+            if (error) {
+                res.status(500).send('Error al actualizar el doctor');
+                return;
+            }
+            if (results.affectedRows === 0) {
+                res.status(404).send('No existe el doctor');
+                return;
+            }
+            res.status(200).json('Doctor actualizado exitosamente');
+        }
+    );
+});
