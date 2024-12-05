@@ -6,19 +6,35 @@ class NuevoDoctor extends HTMLElement{
         this.container = document.createElement('div');
         this.estilo = document.createElement('style');
         this.estilo.textContent = `
-            .form-container{
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            .form-container input{
-                margin: 10px;
-                padding: 5px;
-            }
-            .form-container button{
-                margin: 10px;
-                padding: 5px;
-            }
+                .form-container {
+                    width: 100%;
+                    padding: 20px;
+                    box-sizing: border-box;
+                }
+
+                .form-container h2 {
+                    margin-bottom: 20px;
+                }
+
+                .form-container label {
+                    display: block;
+                    margin-bottom: 5px;
+                }
+
+                .form-container input, .form-container select {
+                    width: 100%;
+                    padding: 5px;
+                    margin-bottom: 10px;
+                    box-sizing: border-box;
+                }
+
+                .form-container button {
+                    padding: 10px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
         `;
 
         this.shadowRoot.appendChild(this.estilo);
@@ -57,6 +73,7 @@ class NuevoDoctor extends HTMLElement{
 
                     <button type="submit">Registrar</button>
                     <button type="reset">Limpiar</button>
+                    <button type="button" onclick="window.location.href='/Proyecto_Sistema_Hospital/gestion_hospital/doctor.html'">Regresar</button>
                 </form>
             </div>
         `;

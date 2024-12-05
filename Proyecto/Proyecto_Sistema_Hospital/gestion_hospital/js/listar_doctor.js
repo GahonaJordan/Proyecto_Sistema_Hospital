@@ -4,21 +4,74 @@ class ListarDoctor extends HTMLElement{
 
         this.attachShadow({mode: 'open'});
         this.container = document.createElement('div');
-        this.container.className = 'container';
+        //this.container.className = 'container';
         this.estilo = document.createElement('style');
         this.estilo.textContent = `
-            .container{
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-around;
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 16px;
+                text-align: center;
             }
-            .error-alert{
-                background-color: #f8d7da;
-                color: #721c24;
+            th, td {
                 padding: 10px;
-                border: 1px solid #f5c6cb;
+                border: 1px solid #ccc;
+            }
+            th {
+                background-color: #f4f4f4;
+            }
+            .actions button {
+                margin: 0 5px;
+                padding: 5px 10px;
+                border: none;
                 border-radius: 5px;
-                margin: 10px;
+                cursor: pointer;
+            }
+            .btn-update {
+                background-color: #4caf50;
+                color: white;
+            }
+            .btn-delete {
+                background-color: #f44336;
+                color: white;
+            }
+            .error-alert {
+                color: red;
+                font-weight: bold;
+            }
+            .empty-alert {
+                color: gray;
+                font-style: italic;
+            }
+            .btn-blue {
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                display: inline-block;
+                margin: 10px 0;
+            }
+            .btn-blue:hover {
+                background-color: #0056b3;
+            }     
+            .mi-div {
+                background-color: #f8f9fa; 
+                border: 1px solid #dee2e6; 
+                border-radius: 8px; 
+                padding: 20px; 
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+                margin: 20px auto; 
+                max-width: 600px; 
+            }
+
+            .mi-div h1 {
+                font-family: 'Arial', sans-serif; 
+                font-size: 30px; 
+                color: #343a40;
+                margin: 0; 
             }
         `;
 
@@ -56,6 +109,12 @@ class ListarDoctor extends HTMLElement{
         }
 
         let tableHtml = `
+        <div class="mi-div">
+            <h1>Lista de Doctores</h1>
+        </div>
+        <div class="direccional">
+            <a href="/Proyecto_Sistema_Hospital/gestion_hospital/from_doctor.html" class="btn-blue">Crear Doctor</a>
+        </div>
             <table>
                 <thead>
                     <tr>
@@ -67,6 +126,7 @@ class ListarDoctor extends HTMLElement{
                         <th>Telefono</th>
                         <th>Correo</th>
                         <th>Horario de Trabajo</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,9 +143,9 @@ class ListarDoctor extends HTMLElement{
                     <td>${doctor.telefono}</td>
                     <td>${doctor.correo}</td>
                     <td>${doctor.horario}</td>
-                    <td>
+                    <td class="actions">
                         <button class="btn-delete" data-id="${doctor.id_doctor}">Eliminar</button>
-                        <button class=".btn-update" data-id="${doctor.id_doctor}">Actualizar</button>
+                        <button class="btn-update" data-id="${doctor.id_doctor}">Actualizar</button>
                     </td>
                 </tr>
             `;
@@ -98,16 +158,45 @@ class ListarDoctor extends HTMLElement{
 
         this.container.innerHTML = tableHtml;
 
-        this.container.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => { 
-                console.log('Eliminar');
-                alert('Eliminar') });
+        // Asignamos eventos a los botones de eliminación
+        this.container.querySelectorAll('.btn-delete').forEach((button) => {
+            button.addEventListener('click', () => this.handleDelete(button.dataset.id));
         });
+        
+        // Asignamos eventos a los botones de actualización
+        this.container.querySelectorAll('.btn-update').forEach((button) => {
+            button.addEventListener('click', () => this.handleUpdate(button.dataset.id));
+        });
+    };
 
-        this.container.querySelectorAll('.btn-update').forEach(btn => {
-            btn.addEventListener('click', this.updateBook);
-        });
-    }
+    // Método para manejar la eliminación
+    handleDelete = async (id_doctor) => {
+        // Mostrar confirmación antes de eliminar
+        const confirmDelete = confirm(`¿Estás seguro de que deseas eliminar el doctor con ID: ${id_doctor}?`);
+        if (confirmDelete) {
+            try {
+                // Enviar solicitud DELETE para eliminar el doctor
+                const response = await fetch(`http://localhost:8000/doctor/${id_doctor}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    alert('Doctor eliminado con éxito');
+                    // Actualizar la lista de doctores después de la eliminación
+                    const apiUrl = this.getAttribute('api-url');
+                    this.fetchData(apiUrl);
+                } else {
+                    alert('Error al eliminar al doctor');
+                }
+            } catch (error) {
+                console.error("Error en la eliminación", error);
+                alert('Error con la conexión de la API');
+            }
+        }
+    };
 }
+
+window.customElements.define('listar-doctor', ListarDoctor);
+
 
 window.customElements.define('listar-doctor', ListarDoctor);

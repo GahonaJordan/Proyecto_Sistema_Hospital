@@ -3,8 +3,19 @@ class Mimenu extends HTMLElement {
         super();
 
         this.shadow = this.attachShadow({ mode: 'open' });
+        //Crear el contenedor del menu
         this.menucontainer = document.createElement('div');
         this.menucontainer.classList.add('menu-container');
+        //crear el contenedor de imagen
+        this.imagenContainer = document.createElement('div');
+        this.imagenContainer.classList.add('imagen-container');
+        //crear la imagen
+        this.listaImagen = document.createElement('li');
+        this.listaImagen.style.listStyleType = 'none';
+        this.logo = document.createElement('img');
+        this.logo.src = '/Proyecto_Sistema_Hospital/adicionales/imagenes/Designer1.png';
+        this.imagenContainer.appendChild(this.logo);
+        //los estilos del menu
         this.styleElement = document.createElement('style');
         this.styleElement.textContent = `
             .menu-container {  
@@ -31,11 +42,25 @@ class Mimenu extends HTMLElement {
             .menu-container a {
                 text-decoration: none;
                 color: inherit;
+            }
+            .imagen-container {
+                display: flex;
+                padding: 1rem;
+                justify-content: center;
+
+            }
+
+            .imagen-container img {
+                width: 350px;
+                height: 90px;
+                margin-right: 8px;
             }           
         `;
 
-        this.shadow.appendChild(this.menucontainer);
         this.shadow.appendChild(this.styleElement);
+        this.shadow.appendChild(this.imagenContainer);
+        this.shadow.appendChild(this.menucontainer);
+        
     }
 
     connectedCallback() {
@@ -47,7 +72,8 @@ class Mimenu extends HTMLElement {
             { item: 'Inicio', link: '/Proyecto_Sistema_Hospital/index.html'},
             { item: 'Doctor', link: '/Proyecto_Sistema_Hospital/gestion_hospital/doctor.html' },
             { item: 'Paciente', link: '/Proyecto_Sistema_Hospital/gestion_hospital/paciente.html' },
-            { item: 'API', link: '/Tarea_API - copia/paginas/api.html' },
+            { item: 'Medicos Asignados', link: '/Proyecto_Sistema_Hospital/gestion_hospital/paciente_doctor.html' },
+            { item: 'Presentación', link: '/Proyecto_Sistema_Hospital/gestion_hospital/estudiante.html' },
         ];
 
         opciones.forEach(op => {

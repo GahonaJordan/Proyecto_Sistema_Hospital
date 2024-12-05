@@ -93,6 +93,7 @@ app.post('/doctor/', (req, res) => {
 // modificar el delete de datos en la tabla doctor
 //----------------------------------------------------------------------------------------
 app.delete('/doctor/:id_doctor', (req, res) => {
+    
     const { id_doctor } = req.params;
     const query = 'DELETE FROM doctor WHERE id_doctor=?';
     db.query(query, [id_doctor], (error, results) => {
@@ -128,6 +129,65 @@ app.put('/doctor/:id_doctor', (req, res) => {
                 return;
             }
             res.status(200).json('Doctor actualizado exitosamente');
+        }
+    );
+});
+
+// ---------------------------------------------------------------------------------------
+// modificar el insertar datos en la tabla paciente
+//----------------------------------------------------------------------------------------
+app.post('/paciente/', (req, res) => {
+    const { id_paciente, nombre, apellido, edad, cedula, telefono, correo, fecha_nacimiento, direccion, historial_medico } = req.body;
+    const query = 'INSERT INTO paciente (id_paciente,nombre,apellido,edad,cedula,telefono,correo,fecha_nacimiento,direccion,historial_medico) VALUES(?,?,?,?,?,?,?,?,?,?)';
+    db.query(query,
+        [id_paciente, nombre, apellido, edad, cedula, telefono, correo, fecha_nacimiento, direccion, historial_medico],
+        (error, results) => {
+            if (error) {
+                res.status(500).send('Error al ejecutar la consulta');
+                return;
+            } else {
+                res.status(201).json({ message: 'Paciente registrado exitosamente', results });
+            }
+        }
+    );
+});
+
+// ---------------------------------------------------------------------------------------
+// Crear el delete de datos en la tabla paciente
+//----------------------------------------------------------------------------------------
+app.delete('/paciente/:id_paciente', (req, res) => {
+    
+    const { id_paciente } = req.params;
+    const query = 'DELETE FROM paciente WHERE id_paciente=?';
+    db.query(query, [id_paciente], (error, results) => {
+        if (error) {
+            res.status(500).send('Error al eliminar el paciente');
+            return;
+        }
+        if (results.affectedRows === 0) {
+            res.status(404).send('No existe el paciente');
+            return;
+        }
+        res.status(200).json({ message: 'Paciente eliminado exitosamente' });
+    });
+});
+
+// ---------------------------------------------------------------------------------------
+// modificar el insertar datos en la tabla doctor_paciente
+//----------------------------------------------------------------------------------------
+
+app.post('/doctor_paciente/', (req, res) => {
+    const { doctor_id, paciente_id, fecha_asignacion } = req.body;
+    const query = 'INSERT INTO doctor_paciente (doctor_id,paciente_id,fecha_asignacion) VALUES(?,?,?)';
+    db.query(query,
+        [doctor_id, paciente_id, fecha_asignacion],
+        (error, results) => {
+            if (error) {
+                res.status(500).send('Error al ejecutar la consulta');
+                return;
+            } else {
+                res.status(201).json({ message: 'Asignacion registrada exitosamente', results });
+            }
         }
     );
 });
